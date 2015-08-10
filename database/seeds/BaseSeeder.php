@@ -1,74 +1,71 @@
-<?php 
+<?php
 
 use Faker\Factory as Faker;
 use Faker\Generator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Seeder;
 
-abstract class BaseSeeder extends Seeder {
+abstract class BaseSeeder extends Seeder
+{
+    protected $total = 50;
+    protected static $pool = array();
 
-	protected $total = 50;
-	protected static $pool = array();
+    public function run()
+    {
+        $this->createMultiple($this->total);
+    }
 
-	public function run(){
+    protected function createMultiple($total, array $customValues = array())
+    {
+        for ($i = 0;$i <= $total;$i++) {
+            $this->create($customValues);
+        }
+    }
 
-		$this->createMultiple($this->total);
-	}
+    protected function create(array $customValues = array())
+    {
+        $values = $this->getDummyData(Faker::create(), $customValues);
+        $values = array_merge($values, $customValues);
 
-	protected function createMultiple($total, array $customValues = array()){
+        return $this->addToPool($this->getModel()->create($values));
+    }
 
-		for($i=0;$i<=$total;$i++){
-			$this->create($customValues);
-		}
+    abstract public function getModel();
 
-	}
+    abstract public function getDummyData(Generator $facker, array $customValues = array());
 
-	protected function create(array $customValues = array()){
+    protected function getRandom($model)
+    {
+        if (!$this->collectionExist($model)) {
+            throw new Exception("The $model collection does no exist");
+        }
 
-		$values = $this->getDummyData(Faker::create(), $customValues);
-		$values = array_merge($values, $customValues);	
+        return static::$pool[$model]->random();
+    }
 
-		return $this->addToPool($this->getModel()->create($values));
+    protected function addToPool($entity)
+    {
+        $reflection = new ReflectionClass($entity);
+        $class = $reflection->getShortName();
 
-	}
+        if (!$this->collectionExist($class)) {
+            static::$pool[$class] = new Collection();
+        }
 
-	abstract public function getModel();
+        static::$pool[$class]->add($entity);
 
-	abstract public function getDummyData(Generator $facker, array $customValues = array());
+        return $entity;
+    }
 
-	protected function getRandom($model){
+    private function collectionExist($class)
+    {
+        return isset(static::$pool[$class]);
+    }
 
-		if (!$this->collectionExist($model)) {
-			throw new Exception("The $model collection does no exist");
-		}
-		return static::$pool[$model]->random();
-	}
+    /*
+    protected function createFrom($seeder, array $customValues = array()){
 
-	protected function addToPool($entity){
-
-		$reflection = new ReflectionClass($entity);
-		$class = $reflection->getShortName();
-
-		if (!$this->collectionExist($class)) {
-
-			static::$pool[$class] = new Collection();	
-		}
-
-		static::$pool[$class]->add($entity);
-
-		return $entity;
-	}
-
-	private function collectionExist($class){
-		
-		return isset(static::$pool[$class]);
-	}	
-
-	/*
-	protected function createFrom($seeder, array $customValues = array()){
-		
-		$seeder = new $seeder;
-		return $seeder->create($customValues);
-	}*/
-
+        $seeder = new $seeder;
+        return $seeder->create($customValues);
+    }*/
 }

@@ -145,6 +145,13 @@ return [
 		'TeachMe\Providers\EventServiceProvider',
 		'TeachMe\Providers\RouteServiceProvider',
 
+		/*
+		* vendor service provider	
+		*/
+		
+		'Collective\Html\HtmlServiceProvider',
+
+
 	],
 
 	/*
@@ -192,6 +199,13 @@ return [
 		'URL'       => 'Illuminate\Support\Facades\URL',
 		'Validator' => 'Illuminate\Support\Facades\Validator',
 		'View'      => 'Illuminate\Support\Facades\View',
+
+		/**
+		* Vendor alises
+		*/
+
+		'Form' =>'Collective\Html\FormFacade',
+      	'Html' =>'Collective\Html\HtmlFacade',
 
 	],
 

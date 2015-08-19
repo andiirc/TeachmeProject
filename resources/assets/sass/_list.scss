@@ -2,7 +2,7 @@
 
 .well{
    border : 0;
-   border-bottom : dotted 1px #ccc;
+   border-bottom : dashed 1px #ccc;
    background : none;
    @include box-shadow(none);
    padding : 2px 0 20px 0;
